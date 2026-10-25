@@ -11,7 +11,9 @@
         },
         "subscriptions": {
           "supported": true,
-          "formats": ["text/event-stream"]
+          "formats": [
+            "text/event-stream"
+          ]
         },
         "onError": "propagate"
       }

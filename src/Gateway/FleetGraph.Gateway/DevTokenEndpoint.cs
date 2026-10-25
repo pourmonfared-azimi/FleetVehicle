@@ -1,4 +1,5 @@
 using FleetGraph.ServiceDefaults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace FleetGraph.Gateway;
@@ -18,7 +19,8 @@ internal static class DevTokenEndpoint
 
     public static IEndpointRouteBuilder MapDevTokenEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/dev/token", (string[]? role, string? user, IOptions<JwtOptions> options) =>
+        // [FromQuery] is required: on a POST, a string[] parameter is otherwise bound from the body.
+        app.MapPost("/dev/token", ([FromQuery] string[]? role, [FromQuery] string? user, IOptions<JwtOptions> options) =>
             {
                 var roles = (role ?? []).Where(s_knownRoles.Contains).Distinct().ToArray();
                 var token = JwtTokenFactory.CreateToken(options.Value, user ?? "demo-user", roles);

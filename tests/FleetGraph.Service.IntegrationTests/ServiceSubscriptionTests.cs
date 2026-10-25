@@ -10,7 +10,7 @@ namespace FleetGraph.Service.IntegrationTests;
 public class ServiceSubscriptionTests(ServiceFactory factory) : IClassFixture<ServiceFactory>
 {
     [Fact]
-    public async Task Status_change_is_pushed_to_subscribers()
+    public async Task Status_changes_are_pushed_to_subscribers()
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
         var client = factory.CreateClient();
@@ -24,7 +24,7 @@ public class ServiceSubscriptionTests(ServiceFactory factory) : IClassFixture<Se
                       serviceOrderStatusChanged {
                         previousStatus
                         newStatus
-                        serviceOrder { id description }
+                        serviceOrder { id description status }
                         vehicle { id }
                       }
                     }
@@ -44,36 +44,46 @@ public class ServiceSubscriptionTests(ServiceFactory factory) : IClassFixture<Se
 
         // Give the subscription a moment to register its topic, then trigger an event.
         await Task.Delay(500, timeout.Token);
+
+        await ChangeStatusAsync("IN_PROGRESS");
+        var first = await ReadEventAsync(reader, timeout.Token);
+        Assert.Contains("\"previousStatus\":\"SCHEDULED\"", first);
+        Assert.Contains("\"newStatus\":\"IN_PROGRESS\"", first);
+        Assert.Contains("\"description\":\"Tachograph calibration\"", first);
+        Assert.Contains("\"status\":\"IN_PROGRESS\"", first);
+
+        // A second event on the same long-lived subscription must not see cached data.
+        await ChangeStatusAsync("AWAITING_PARTS");
+        var second = await ReadEventAsync(reader, timeout.Token);
+        Assert.Contains("\"previousStatus\":\"IN_PROGRESS\"", second);
+        Assert.Contains("\"newStatus\":\"AWAITING_PARTS\"", second);
+        Assert.Contains("\"status\":\"AWAITING_PARTS\"", second);
+    }
+
+    private async Task ChangeStatusAsync(string status)
+    {
         var mutation = await factory.CreateClient().PostAsync(
-            """
+            $$"""
             mutation {
-              updateServiceOrderStatus(input: { serviceOrderId: 4, status: IN_PROGRESS }) {
+              updateServiceOrderStatus(input: { serviceOrderId: 4, status: {{status}} }) {
                 serviceOrder { status }
               }
             }
             """,
             token: TestTokens.Technician);
         Assert.False(mutation.HasErrors, mutation.Body);
+    }
 
-        string? data = null;
-        while (!timeout.IsCancellationRequested)
+    private static async Task<string> ReadEventAsync(StreamReader reader, CancellationToken cancellationToken)
+    {
+        while (await reader.ReadLineAsync(cancellationToken) is { } line)
         {
-            var line = await reader.ReadLineAsync(timeout.Token);
-            if (line is null)
-            {
-                break;
-            }
-
             if (line.StartsWith("data:", StringComparison.Ordinal) && line.Contains("serviceOrderStatusChanged"))
             {
-                data = line["data:".Length..].Trim();
-                break;
+                return line["data:".Length..].Trim();
             }
         }
 
-        Assert.NotNull(data);
-        Assert.Contains("\"previousStatus\":\"SCHEDULED\"", data);
-        Assert.Contains("\"newStatus\":\"IN_PROGRESS\"", data);
-        Assert.Contains("\"description\":\"Tachograph calibration\"", data);
+        throw new InvalidOperationException("The event stream ended before an event arrived.");
     }
 }
