@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\FleetGraph.Parts.Application\FleetGraph.Service.Application.csproj" />
+    <ProjectReference Include="..\FleetGraph.Parts.Application\FleetGraph.Parts.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

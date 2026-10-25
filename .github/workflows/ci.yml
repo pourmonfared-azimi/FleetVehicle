@@ -12,10 +12,10 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
       - run: dotnet restore FleetGraph.slnx
@@ -23,21 +23,22 @@ jobs:
       - run: dotnet test FleetGraph.slnx -c Release --no-build --logger "trx" --results-directory TestResults
         env:
           CI: "true"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: test-results
           path: TestResults
+          if-no-files-found: ignore
 
   # Schema governance: drift, composition and breaking-change checks.
   schema-governance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build-and-test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
       - run: dotnet tool restore
@@ -91,9 +92,9 @@ jobs:
           fi
 
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build-and-test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build all images (also composes the supergraph)
         run: docker compose build

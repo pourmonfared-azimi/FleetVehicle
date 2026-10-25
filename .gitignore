@@ -9,3 +9,6 @@ TestResults/
 coverage*/
 .env
 *.received
+
+# Composed locally by scripts/compose.*; the gateway image composes its own.
+src/Gateway/FleetGraph.Gateway/gateway.far

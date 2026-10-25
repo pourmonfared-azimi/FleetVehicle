@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
     End-to-end tests through the Fusion gateway. They need the full stack running:
-      docker compose up -d --build
+      docker compose up -d (with the build flag)
       FLEETGRAPH_GATEWAY_URL=http://localhost:5100 dotnet test tests/FleetGraph.EndToEndTests
     Without the variable every test is skipped.
   -->

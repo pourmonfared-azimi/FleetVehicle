@@ -28,6 +28,32 @@ DataLoaders, field-level authorization and end-to-end OpenTelemetry tracing.
 One query can return a vehicle, its open service orders, the workshop and the stock of every
 part each order needs — the gateway plans the calls across the three subgraphs.
 
+## Prerequisites
+
+- [.NET SDK 10](https://dotnet.microsoft.com/download) (`global.json` pins 10.0.100, later feature bands roll forward)
+- Docker Desktop (or another Docker engine), running, for `docker compose`
+- Node.js only if you want to run the breaking-change check locally (`npx @graphql-inspector/cli`)
+
+## First run
+
+```powershell
+dotnet build FleetGraph.slnx
+dotnet tool restore             # Nitro CLI (fusion compose)
+./scripts/compose.ps1           # export schemas + compose gateway.far   (bash: ./scripts/compose.sh)
+dotnet test                     # schema snapshots are created on the first run
+docker compose up --build
+```
+
+The first run creates files that **must be committed**, because CI checks against them:
+
+| File | Why |
+|---|---|
+| `src/*/FleetGraph.*.Api/schema.graphqls` | Schema contract: drift check and breaking change check |
+| `tests/FleetGraph.*.IntegrationTests/__snapshots__/*` | Schema snapshots; with `CI=true` a missing snapshot fails the test |
+
+`src/Gateway/FleetGraph.Gateway/gateway.far` is git-ignored: it is only for local runs, and
+the gateway Docker image composes its own for the `Docker` environment.
+
 ## Run it
 
 **Docker (one command):**
@@ -178,6 +204,17 @@ FLEETGRAPH_GATEWAY_URL=http://localhost:5100 dotnet test tests/FleetGraph.EndToE
    date ([ADR 0003](docs/adr/0003-versioning-and-deprecation.md)).
 4. Every type has one owning subgraph ([docs/ownership.md](docs/ownership.md)); naming,
    nullability, pagination and error rules are in [docs/schema-guidelines.md](docs/schema-guidelines.md).
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
+|---|---|
+| `failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine` | Docker Desktop is not running. Start it and retry `docker compose up --build`. |
+| `Schema file '.../schema.graphqls' does not exist` in `compose.ps1` | Run the script from an up-to-date checkout: the export passes absolute `--output` paths (a relative path is resolved against the project folder). |
+| Mutations return `AUTH_NOT_AUTHORIZED` | The token has no roles. Check the `roles` array in the `/dev/token` response and request the roles you need, e.g. `?role=Technician`. |
+| `/dev/token` returns 404 | The endpoint is only mapped when `Jwt:EnableDevTokenEndpoint=true` (Development settings, and `docker-compose.yml`). |
+| A schema snapshot test fails | The schema changed. If it is intended: `UPDATE_SNAPSHOTS=1 dotnet test`, run `./scripts/export-schemas.*`, and commit both. |
+| Subscription returns only `:` lines | Those are SSE keep-alives; no event has been published yet. Change a service order status in another tab. |
 
 ## Tech
 

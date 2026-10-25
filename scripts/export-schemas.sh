@@ -8,5 +8,5 @@ cd "$ROOT"
 for s in Vehicles Service Parts; do
   echo "==> Exporting $s"
   dotnet run --project "src/$s/FleetGraph.$s.Api" --no-launch-profile -- \
-    schema export --output "src/$s/FleetGraph.$s.Api/schema.graphqls"
+    schema export --output "$ROOT/src/$s/FleetGraph.$s.Api/schema.graphqls"
 done

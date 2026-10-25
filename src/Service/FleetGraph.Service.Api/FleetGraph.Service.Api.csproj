@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The source schema contract (exported by `dotnet run -- schema export`). -->
+    <!-- The source schema contract (exported by `dotnet run schema export`). -->
     <Content Remove="schema-settings.json" />
     <None Include="schema-settings.json" />
   </ItemGroup>
