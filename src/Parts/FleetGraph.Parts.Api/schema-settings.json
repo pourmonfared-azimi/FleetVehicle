@@ -1,0 +1,24 @@
+{
+  "name": "Parts",
+  "transports": {
+    "http": {
+      "url": "{{PARTS_URL}}",
+      "capabilities": {
+        "batching": {
+          "variableBatching": true,
+          "requestBatching": true,
+          "aliasBatching": true
+        },
+        "onError": "propagate"
+      }
+    }
+  },
+  "environments": {
+    "Development": {
+      "PARTS_URL": "http://localhost:5103/graphql"
+    },
+    "Docker": {
+      "PARTS_URL": "http://parts:8080/graphql"
+    }
+  }
+}

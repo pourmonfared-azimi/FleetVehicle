@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>FleetGraph.Gateway</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\FleetGraph.ServiceDefaults\FleetGraph.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.Fusion.AspNetCore" />
+    <PackageReference Include="HotChocolate.Fusion.Diagnostics" />
+    <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Composed by scripts/compose.(sh|ps1) locally, or inside the Docker build. -->
+    <None Update="gateway.far" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="trusted-documents\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,28 @@
+{
+  "name": "Service",
+  "transports": {
+    "http": {
+      "url": "{{SERVICE_URL}}",
+      "capabilities": {
+        "batching": {
+          "variableBatching": true,
+          "requestBatching": true,
+          "aliasBatching": true
+        },
+        "subscriptions": {
+          "supported": true,
+          "formats": ["text/event-stream"]
+        },
+        "onError": "propagate"
+      }
+    }
+  },
+  "environments": {
+    "Development": {
+      "SERVICE_URL": "http://localhost:5102/graphql"
+    },
+    "Docker": {
+      "SERVICE_URL": "http://service:8080/graphql"
+    }
+  }
+}

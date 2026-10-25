@@ -1,0 +1,16 @@
+query VehicleOverview($first: Int!) {
+  vehicles(first: $first) {
+    nodes {
+      id
+      registrationNumber
+      status
+      serviceOrders(onlyOpen: true) {
+        id
+        status
+        workshop {
+          name
+        }
+      }
+    }
+  }
+}

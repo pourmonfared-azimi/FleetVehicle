@@ -1,0 +1,119 @@
+# One command: docker compose up --build
+#   Gateway (GraphQL IDE): http://localhost:5100/graphql
+#   Jaeger (traces):       http://localhost:16686
+name: fleetgraph
+
+x-subgraph-env: &subgraph-env
+  ASPNETCORE_ENVIRONMENT: Production
+  Database__Provider: Postgres
+  GraphQL__AllowIntrospection: "true"   # demo only
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+  OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: fleet
+      POSTGRES_PASSWORD: fleet
+      POSTGRES_DB: fleet
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fleet -d fleet"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # UI
+      - "4317:4317"     # OTLP gRPC
+
+  vehicles:
+    build:
+      context: .
+      dockerfile: src/Dockerfile.subgraph
+      args:
+        PROJECT: src/Vehicles/FleetGraph.Vehicles.Api/FleetGraph.Vehicles.Api.csproj
+        ASSEMBLY: FleetGraph.Vehicles.Api
+    environment:
+      <<: *subgraph-env
+      ConnectionStrings__Vehicles: Host=postgres;Database=fleet_vehicles;Username=fleet;Password=fleet
+    ports:
+      - "5101:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  service:
+    build:
+      context: .
+      dockerfile: src/Dockerfile.subgraph
+      args:
+        PROJECT: src/Service/FleetGraph.Service.Api/FleetGraph.Service.Api.csproj
+        ASSEMBLY: FleetGraph.Service.Api
+    environment:
+      <<: *subgraph-env
+      ConnectionStrings__Service: Host=postgres;Database=fleet_service;Username=fleet;Password=fleet
+      ConnectionStrings__Redis: redis:6379
+    ports:
+      - "5102:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  parts:
+    build:
+      context: .
+      dockerfile: src/Dockerfile.subgraph
+      args:
+        PROJECT: src/Parts/FleetGraph.Parts.Api/FleetGraph.Parts.Api.csproj
+        ASSEMBLY: FleetGraph.Parts.Api
+    environment:
+      <<: *subgraph-env
+      ConnectionStrings__Parts: Host=postgres;Database=fleet_parts;Username=fleet;Password=fleet
+    ports:
+      - "5103:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: .
+      dockerfile: src/Gateway/FleetGraph.Gateway/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      GraphQL__AllowIntrospection: "true"   # demo only: keeps the Nitro IDE usable
+      Jwt__EnableDevTokenEndpoint: "true"   # demo only: POST /dev/token?role=FleetManager
+      TrustedDocuments__Enforce: "false"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+    ports:
+      - "5100:8080"
+    depends_on:
+      - vehicles
+      - service
+      - parts
+      - jaeger
+
+volumes:
+  pgdata:

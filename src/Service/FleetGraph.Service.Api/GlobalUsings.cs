@@ -1,0 +1,10 @@
+global using FleetGraph.GraphQL;
+global using FleetGraph.ServiceDefaults;
+global using GreenDonut;
+global using HotChocolate;
+global using HotChocolate.Authorization;
+global using HotChocolate.CostAnalysis.Types;
+global using HotChocolate.Data;
+global using HotChocolate.Types;
+global using HotChocolate.Types.Composite;
+global using HotChocolate.Subscriptions;

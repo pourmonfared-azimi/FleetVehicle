@@ -1,0 +1,44 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/FleetGraph.SharedKernel/FleetGraph.SharedKernel.csproj" />
+    <Project Path="src/BuildingBlocks/FleetGraph.ServiceDefaults/FleetGraph.ServiceDefaults.csproj" />
+    <Project Path="src/BuildingBlocks/FleetGraph.GraphQL/FleetGraph.GraphQL.csproj" />
+  </Folder>
+  <Folder Name="/src/Vehicles/">
+    <Project Path="src/Vehicles/FleetGraph.Vehicles.Domain/FleetGraph.Vehicles.Domain.csproj" />
+    <Project Path="src/Vehicles/FleetGraph.Vehicles.Application/FleetGraph.Vehicles.Application.csproj" />
+    <Project Path="src/Vehicles/FleetGraph.Vehicles.Infrastructure/FleetGraph.Vehicles.Infrastructure.csproj" />
+    <Project Path="src/Vehicles/FleetGraph.Vehicles.Api/FleetGraph.Vehicles.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Service/">
+    <Project Path="src/Service/FleetGraph.Service.Domain/FleetGraph.Service.Domain.csproj" />
+    <Project Path="src/Service/FleetGraph.Service.Application/FleetGraph.Service.Application.csproj" />
+    <Project Path="src/Service/FleetGraph.Service.Infrastructure/FleetGraph.Service.Infrastructure.csproj" />
+    <Project Path="src/Service/FleetGraph.Service.Api/FleetGraph.Service.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Parts/">
+    <Project Path="src/Parts/FleetGraph.Parts.Domain/FleetGraph.Parts.Domain.csproj" />
+    <Project Path="src/Parts/FleetGraph.Parts.Application/FleetGraph.Parts.Application.csproj" />
+    <Project Path="src/Parts/FleetGraph.Parts.Infrastructure/FleetGraph.Parts.Infrastructure.csproj" />
+    <Project Path="src/Parts/FleetGraph.Parts.Api/FleetGraph.Parts.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Gateway/">
+    <Project Path="src/Gateway/FleetGraph.Gateway/FleetGraph.Gateway.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FleetGraph.Testing/FleetGraph.Testing.csproj" />
+    <Project Path="tests/FleetGraph.UnitTests/FleetGraph.UnitTests.csproj" />
+    <Project Path="tests/FleetGraph.Vehicles.IntegrationTests/FleetGraph.Vehicles.IntegrationTests.csproj" />
+    <Project Path="tests/FleetGraph.Service.IntegrationTests/FleetGraph.Service.IntegrationTests.csproj" />
+    <Project Path="tests/FleetGraph.Parts.IntegrationTests/FleetGraph.Parts.IntegrationTests.csproj" />
+    <Project Path="tests/FleetGraph.EndToEndTests/FleetGraph.EndToEndTests.csproj" />
+  </Folder>
+  <Folder Name="/solution-items/">
+    <File Path="docker-compose.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>

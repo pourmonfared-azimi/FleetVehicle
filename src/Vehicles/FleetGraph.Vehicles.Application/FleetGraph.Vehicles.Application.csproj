@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\FleetGraph.Vehicles.Domain\FleetGraph.Vehicles.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Only the DI abstractions: the application layer stays host and framework agnostic. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+</Project>

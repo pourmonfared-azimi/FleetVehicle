@@ -1,0 +1,24 @@
+{
+  "name": "Vehicles",
+  "transports": {
+    "http": {
+      "url": "{{VEHICLES_URL}}",
+      "capabilities": {
+        "batching": {
+          "variableBatching": true,
+          "requestBatching": true,
+          "aliasBatching": true
+        },
+        "onError": "propagate"
+      }
+    }
+  },
+  "environments": {
+    "Development": {
+      "VEHICLES_URL": "http://localhost:5101/graphql"
+    },
+    "Docker": {
+      "VEHICLES_URL": "http://vehicles:8080/graphql"
+    }
+  }
+}

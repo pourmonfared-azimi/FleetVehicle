@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Shared Dockerfile for the three subgraphs. Build context: repository root.
+#   docker build -f src/Dockerfile.subgraph \
+#     --build-arg PROJECT=src/Vehicles/FleetGraph.Vehicles.Api/FleetGraph.Vehicles.Api.csproj \
+#     --build-arg ASSEMBLY=FleetGraph.Vehicles.Api .
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG PROJECT
+WORKDIR /repo
+COPY global.json Directory.Build.props Directory.Packages.props ./
+COPY src/ src/
+RUN dotnet restore "$PROJECT"
+RUN dotnet publish "$PROJECT" -c Release --no-restore -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+ARG ASSEMBLY
+ENV APP_ASSEMBLY=${ASSEMBLY} \
+    ASPNETCORE_HTTP_PORTS=8080
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+USER $APP_UID
+ENTRYPOINT ["sh", "-c", "exec dotnet \"$APP_ASSEMBLY.dll\""]

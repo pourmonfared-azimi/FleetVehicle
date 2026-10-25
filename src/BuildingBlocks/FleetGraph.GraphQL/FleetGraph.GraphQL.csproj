@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    GraphQL conventions shared by all subgraphs, so every team's schema follows the same
+    rules (docs/schema-guidelines.md): paging defaults, error interface, mutation
+    conventions, depth limits, introspection policy and instrumentation.
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" />
+    <PackageReference Include="HotChocolate.Data" />
+    <PackageReference Include="HotChocolate.Diagnostics" />
+  </ItemGroup>
+</Project>
